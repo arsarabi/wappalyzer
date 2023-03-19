@@ -610,9 +610,9 @@ const Driver = {
         if (
           detections.find(
             ({ technology: { slug } }) => slug === detection.technology.slug
-          )
+          ) && (!detection.urls || !detection.urls.includes(url))
         ) {
-          detection.lastUrl = url
+          detection.urls = [...detection.urls || [], url]
         }
 
         return detection
@@ -690,7 +690,7 @@ const Driver = {
                   pattern: { regex, confidence },
                   version,
                   rootPath,
-                  lastUrl,
+                  urls,
                 }) => ({
                   technology,
                   pattern: {
@@ -699,7 +699,7 @@ const Driver = {
                   },
                   version,
                   rootPath,
-                  lastUrl,
+                  urls,
                 })
               ),
           },
@@ -736,9 +736,9 @@ const Driver = {
     let icon = 'default.svg'
 
     const _technologies = technologies.filter(
-      ({ slug, lastUrl }) =>
+      ({ slug, urls }) =>
         slug !== 'cart-functionality' &&
-        (showCached || isSimilarUrl(url, lastUrl))
+        (showCached || isSimilarUrl(url, urls[urls.length - 1]))
     )
 
     if (dynamicIcon) {
@@ -823,7 +823,7 @@ const Driver = {
     const cache = Driver.cache.hostnames?.[hostname]
 
     const resolved = (cache ? resolve(cache.detections) : []).filter(
-      ({ lastUrl }) => showCached || isSimilarUrl(url, lastUrl)
+      ({ urls }) => showCached || isSimilarUrl(url, urls[urls.length - 1])
     )
 
     await Driver.setIcon(url, resolved)
@@ -1058,7 +1058,7 @@ chrome.tabs.onUpdated.addListener(async (id, { status, url }) => {
     const cache = Driver.cache?.hostnames?.[hostname]
 
     const resolved = (cache ? resolve(cache.detections) : []).filter(
-      ({ lastUrl }) => showCached || isSimilarUrl(url, lastUrl)
+      ({ urls }) => showCached || isSimilarUrl(url, urls[urls.length - 1])
     )
 
     await Driver.setIcon(url, resolved)

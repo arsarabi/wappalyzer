@@ -96,7 +96,7 @@ const Wappalyzer = {
    * @param {Array} detections
    */
   resolve(detections = []) {
-    const resolved = detections.reduce((resolved, { technology, lastUrl }) => {
+    const resolved = detections.reduce((resolved, { technology, urls }) => {
       if (
         resolved.findIndex(
           ({ technology: { name } }) => name === technology.name
@@ -129,7 +129,7 @@ const Wappalyzer = {
             }
           )
 
-        resolved.push({ technology, confidence, version, rootPath, lastUrl })
+        resolved.push({ technology, confidence, version, rootPath, urls })
       }
 
       return resolved
@@ -161,7 +161,7 @@ const Wappalyzer = {
           confidence,
           version,
           rootPath,
-          lastUrl,
+          urls,
         }) => ({
           name,
           description,
@@ -174,7 +174,7 @@ const Wappalyzer = {
           pricing,
           cpe,
           rootPath,
-          lastUrl,
+          urls,
         })
       )
   },
@@ -260,7 +260,7 @@ const Wappalyzer = {
     do {
       done = true
 
-      resolved.forEach(({ technology, confidence, lastUrl }) => {
+      resolved.forEach(({ technology, confidence, urls }) => {
         technology.implies.forEach(
           ({ name, confidence: _confidence, version }) => {
             const implied = Wappalyzer.getTechnology(name)
@@ -278,7 +278,7 @@ const Wappalyzer = {
                 technology: implied,
                 confidence: Math.min(confidence, _confidence),
                 version: version || '',
-                lastUrl,
+                urls,
               })
 
               done = false
